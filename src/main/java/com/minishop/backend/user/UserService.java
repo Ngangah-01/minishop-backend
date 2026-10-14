@@ -25,7 +25,8 @@ public class UserService {
         }
 
         User user = new User(
-                userRequest.name(),
+                userRequest.firstName(),
+                userRequest.lastName(),
                 userRequest.email(),
                 passwordEncoder.encode(userRequest.password()),
                 Role.CUSTOMER

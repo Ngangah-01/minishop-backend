@@ -49,7 +49,8 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         User user = new User(
-                request.name(),
+                request.firstName(),
+                request.lastName(),
                 request.email(),
                 encoder.encode(request.password()),
                 Role.CUSTOMER

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
 @Setter
 @Entity
 @Table(name = "users")
@@ -15,8 +16,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "firstname", nullable = false)
+    private String firstName;
+
+    @Column(name = "lastname", nullable = false)
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -37,8 +41,9 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String password, Role role) {
-        this.name = name;
+    public User(String firstName, String lastName, String email, String password, Role role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -62,16 +67,4 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
-    public Long getId() { return id; }
-
-    public String getName() { return name; }
-
-    public String getEmail() { return email; }
-
-    public String getPassword() { return password; }
-
-    public Role getRole() { return role; }
-
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 }
