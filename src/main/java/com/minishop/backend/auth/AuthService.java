@@ -10,7 +10,7 @@ import com.minishop.backend.user.Role;
 import com.minishop.backend.user.User;
 import com.minishop.backend.user.UserRepository;
 import com.minishop.backend.user.dto.UserResponse;
-import org.springframework.context.MessageSource;
+//import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,22 +27,22 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
-    private final MessageSource messageSource;
+//    private final MessageSource messageSource;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder encoder,
             AuthenticationManager authenticationManager,
             CustomUserDetailsService userDetailsService,
-            JwtService jwtService,
-            MessageSource messageSource
+            JwtService jwtService
+//            MessageSource messageSource
     ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
-        this.messageSource = messageSource;
+//        this.messageSource = messageSource;
     }
 
     @LogExecutionTime
@@ -76,11 +76,7 @@ public AuthResponse login(LoginRequest request) {
         );
 
         User user = userRepository.findByEmailIgnoreCase(request.email())
-                .orElseThrow(() ->
-                        new BadCredentialsException(
-                                "Invalids email or password"
-                        )
-                );
+                .orElseThrow();
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 

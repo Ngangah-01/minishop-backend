@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
             MethodArgumentNotValidException exception
     ) {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors = new LinkedHashMap<>();
 
         exception.getBindingResult()
                 .getFieldErrors()
@@ -63,28 +62,30 @@ public class GlobalExceptionHandler {
                 );
 
 
+        String message = errors.values()
+                .stream()
+                .findFirst()
+                .orElse("Validation failed");
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
-                        ApiResponse.error(
-                                "Validation failed",
+                        ApiResponse.error(message,
                                 errors
                         )
                 );
     }
-//    handling duplicate sku exception
+//    handling duplicates  exception
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleDuplicates(
             DataIntegrityViolationException exception
     ) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .body(
-                        ApiResponse.error(
-                                exception.getMessage(),
-                                null
-                        )
-                );
+                .body(ApiResponse.error(
+                        exception.getMessage(),
+                        null
+                ));
     }
 
 //    delete category error
