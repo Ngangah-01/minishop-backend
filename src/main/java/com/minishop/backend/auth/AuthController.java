@@ -1,10 +1,11 @@
 package com.minishop.backend.auth;
 
 import com.minishop.backend.auth.dto.AuthResponse;
-import com.minishop.backend.auth.dto.AuthResponse;
 import com.minishop.backend.auth.dto.LoginRequest;
 import com.minishop.backend.auth.dto.RegisterRequest;
 import com.minishop.backend.common.response.ApiResponse;
+import com.minishop.backend.security.CurrentUserProvider;
+import com.minishop.backend.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final CurrentUserProvider currentUserProvider;
 
-    public AuthController(AuthService authService){
+    public AuthController(AuthService authService, CurrentUserProvider currentUserProvider) {
         this.authService = authService;
+        this.currentUserProvider = currentUserProvider;
     }
 
 //    register user
@@ -47,6 +50,14 @@ public ResponseEntity<ApiResponse<AuthResponse>> register(
                 ApiResponse.success(
                         "User logged in successfully",
                         authResponse)
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+        UserResponse user = UserResponse.from(currentUserProvider.getCurrentUser());
+        return ResponseEntity.ok(
+                ApiResponse.success("Current user retrieved successfully", user)
         );
     }
 
