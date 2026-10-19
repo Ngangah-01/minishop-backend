@@ -60,5 +60,4 @@ public ResponseEntity<ApiResponse<AuthResponse>> register(
                 ApiResponse.success("Current user retrieved successfully", user)
         );
     }
-
 }
