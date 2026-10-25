@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -43,6 +45,14 @@ public class Product {
     @Column(nullable = false)
     private Integer stockQuantity;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC, id ASC")
+    private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<ProductVariant> variants = new ArrayList<>();
+
     //createdAt and updatedAt fields for tracking when the product was created and last updated
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -63,6 +73,26 @@ public class Product {
         this.stockQuantity = stockQuantity;
         this.sku = sku;
 
+    }
+
+    public void addImage(ProductImage image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void clearImages() {
+        images.clear();
+    }
+
+    public void addVariant(ProductVariant variant) {
+        variants.add(variant);
+        variant.setProduct(this);
+    }
+
+    public void synchronizeStockWithVariants() {
+        stockQuantity = variants.stream()
+                .mapToInt(ProductVariant::getStockQuantity)
+                .sum();
     }
 
     @PrePersist

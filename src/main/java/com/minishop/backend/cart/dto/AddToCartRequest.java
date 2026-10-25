@@ -10,6 +10,11 @@ public record AddToCartRequest(
 
         @NotNull(message = "Quantity is required")
         @Min(value = 1, message = "Quantity must be at least 1")
-        Integer quantity
+        Integer quantity,
+
+        Long variantId
 ) {
+    public AddToCartRequest(Long productId, Integer quantity) {
+        this(productId, quantity, null);
+    }
 }

@@ -5,6 +5,7 @@ import com.minishop.backend.cart.dto.CartResponse;
 import com.minishop.backend.cart.dto.UpdateCartItemRequest;
 import com.minishop.backend.common.exception.ResourceNotFoundException;
 import com.minishop.backend.product.Product;
+import com.minishop.backend.product.ProductVariant;
 import com.minishop.backend.product.ProductRepository;
 import com.minishop.backend.security.CurrentUserProvider;
 import com.minishop.backend.user.User;
@@ -41,9 +42,11 @@ public class CartService {
         return CartResponse.from(cart);
     }
 
+    @Transactional
     public CartResponse addToCart(AddToCartRequest request) {
         Cart cart = getOrCreateCartForCurrentUser();
         Product product = findProductOrThrow(request.productId());
+        ProductVariant variant = findVariantOrThrow(product, request.variantId());
 
         CartItem existingItem = cartItemRepository
                 .findByCartIdAndProductId(cart.getId(), product.getId())
@@ -52,12 +55,16 @@ public class CartService {
         int currentQuantity = (existingItem != null) ? existingItem.getQuantity() : 0;
         int targetQuantity = currentQuantity + request.quantity();
 
-        validateStock(product, targetQuantity);
+        if (existingItem != null && !sameVariant(existingItem.getVariant(), variant)) {
+            throw new IllegalArgumentException(
+                    "A cart can contain only one variant of a product; remove the current item first");
+        }
+        validateStock(product, variant, targetQuantity);
 
         if (existingItem != null) {
             existingItem.setQuantity(targetQuantity);
         } else {
-            CartItem cartItem = new CartItem(product, request.quantity());
+            CartItem cartItem = new CartItem(product, variant, request.quantity());
             cart.addItem(cartItem);
         }
 
@@ -65,6 +72,7 @@ public class CartService {
         return CartResponse.from(cart);
     }
 
+    @Transactional
     public CartResponse updateCartItem(Long productId, UpdateCartItemRequest request) {
         Cart cart = getOrCreateCartForCurrentUser();
         Product product = findProductOrThrow(productId);
@@ -76,7 +84,14 @@ public class CartService {
             return removeFromCart(productId);
         }
 
-        validateStock(product, newQuantity);
+        CartItem existingItem = cartItemRepository
+                .findByCartIdAndProductId(cart.getId(), productId)
+                .orElse(null);
+        if (existingItem == null && !product.getVariants().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Select a variant using the add-to-cart endpoint before updating this product");
+        }
+        validateStock(product, existingItem == null ? null : existingItem.getVariant(), newQuantity);
 
         CartItem cartItem = cartItemRepository
                 .findByCartIdAndProductId(cart.getId(), productId)
@@ -92,6 +107,7 @@ public class CartService {
         return CartResponse.from(cart);
     }
 
+    @Transactional
     public CartResponse removeFromCart(Long productId) {
         User user = currentUserProvider.getCurrentUser();
 
@@ -104,6 +120,7 @@ public class CartService {
         return getMyCart();
     }
 
+    @Transactional
     public void clearCart() {
         User user = currentUserProvider.getCurrentUser();
         cartRepository.findByUser(user).ifPresent(cart -> {
@@ -132,12 +149,38 @@ public class CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
     }
 
-    private void validateStock(Product product, int requestedQuantity) {
-        if (requestedQuantity > product.getStockQuantity()) {
+    private void validateStock(Product product, ProductVariant variant, int requestedQuantity) {
+        if (variant == null && !product.getVariants().isEmpty()) {
+            throw new IllegalArgumentException("A variant must be selected for this product");
+        }
+        int available = variant == null ? product.getStockQuantity() : variant.getStockQuantity();
+        if (requestedQuantity > available) {
             throw new IllegalArgumentException(
                     "Not enough stock available for '" + product.getName() + "'. " +
-                            "Requested: " + requestedQuantity + ", Available: " + product.getStockQuantity()
+                        "Requested: " + requestedQuantity + ", Available: " + available
             );
         }
+    }
+
+    private ProductVariant findVariantOrThrow(Product product, Long variantId) {
+        if (product.getVariants().isEmpty()) {
+            if (variantId != null) {
+                throw new IllegalArgumentException("This product does not have variants");
+            }
+            return null;
+        }
+        if (variantId == null) {
+            throw new IllegalArgumentException("A variant must be selected for this product");
+        }
+        return product.getVariants().stream()
+                .filter(variant -> variant.getId().equals(variantId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Variant with id " + variantId + " not found for product " + product.getId()));
+    }
+
+    private boolean sameVariant(ProductVariant current, ProductVariant requested) {
+        return current == null ? requested == null
+                : requested != null && current.getId().equals(requested.getId());
     }
 }

@@ -1,6 +1,7 @@
 package com.minishop.backend.cart;
 
 import com.minishop.backend.product.Product;
+import com.minishop.backend.product.ProductVariant;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,10 @@ public class CartItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variant_id")
+    private ProductVariant variant;
+
 
     @Column(nullable = false)
     private Integer quantity;
@@ -51,6 +56,12 @@ public class CartItem {
 
     public CartItem(Product product, Integer quantity) {
         this.product = product;
+        this.quantity = quantity;
+    }
+
+    public CartItem(Product product, ProductVariant variant, Integer quantity) {
+        this.product = product;
+        this.variant = variant;
         this.quantity = quantity;
     }
 

@@ -42,22 +42,29 @@ public class OrderService {
 
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
+            var variant = cartItem.getVariant();
             int quantity = cartItem.getQuantity();
-            int available = product.getStockQuantity();
+            if (!product.getVariants().isEmpty() && variant == null) {
+                throw new IllegalArgumentException(
+                        "A variant must be selected for product '" + product.getName() + "'");
+            }
+            int available = variant == null ? product.getStockQuantity() : variant.getStockQuantity();
 
-            if (product.getStockQuantity() < quantity) {
+            if (available < quantity) {
                 throw new InsufficientStockException(
                         "Not enough stock for '" + product.getName() +
                                 "': requested " + quantity +
-                                ", available " + available );
+                                ", available " + available);
             }
 
-            // No productRepository.save() needed: `product` is a managed entity
-            // inside this transaction, so Hibernate detects the change ("dirty
-            // checking") and writes the UPDATE automatically at commit.
-            product.setStockQuantity(product.getStockQuantity() - quantity);
+            if (variant == null) {
+                product.setStockQuantity(product.getStockQuantity() - quantity);
+            } else {
+                variant.setStockQuantity(variant.getStockQuantity() - quantity);
+                product.synchronizeStockWithVariants();
+            }
 
-            order.addItem(new OrderItem(product, quantity));
+            order.addItem(new OrderItem(product, variant, quantity));
         }
 
         Order saved = orderRepository.save(order);
@@ -132,11 +139,13 @@ public OrderResponse getMyOrder(Long orderId) {
         for (OrderItem orderItem : order.getItems()) {
 
             Product product = orderItem.getProduct();
-
-            product.setStockQuantity(
-                    product.getStockQuantity()
-                            + orderItem.getQuantity()
-            );
+            if (orderItem.getVariant() == null) {
+                product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
+            } else {
+                orderItem.getVariant().setStockQuantity(
+                        orderItem.getVariant().getStockQuantity() + orderItem.getQuantity());
+                product.synchronizeStockWithVariants();
+            }
         }
 
         /*

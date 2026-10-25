@@ -19,12 +19,7 @@ public record CartResponse(
         List<CartItemResponse> items =
                 cart.getItems()
                         .stream()
-                        .map(item ->
-                                CartItemResponse.from(
-                                        item.getProduct(),
-                                        item.getQuantity()
-                                )
-                        )
+                        .map(CartItemResponse::from)
                         .toList();
 
         Integer totalItems =

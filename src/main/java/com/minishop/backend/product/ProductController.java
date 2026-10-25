@@ -3,6 +3,8 @@ package com.minishop.backend.product;
 import com.minishop.backend.common.response.ApiResponse;
 import com.minishop.backend.product.dto.ProductRequest;
 import com.minishop.backend.product.dto.ProductResponse;
+import com.minishop.backend.product.dto.ProductImageRequest;
+import com.minishop.backend.product.dto.ProductVariantRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +61,56 @@ public class ProductController {
         ProductResponse product = productService.findById(id);
         return ResponseEntity.ok(
                 ApiResponse.success("Product retrieved successfully", product));
+    }
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<ApiResponse<ProductResponse>> addProductImage(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductImageRequest request
+    ) {
+        ProductResponse product = productService.addImage(id, request.url());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Product image added successfully", product));
+    }
+
+    @DeleteMapping("/{id}/images/{imageId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> deleteProductImage(
+            @PathVariable Long id,
+            @PathVariable Long imageId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Product image deleted successfully", productService.deleteImage(id, imageId)));
+    }
+
+    @PostMapping("/{id}/variants")
+    public ResponseEntity<ApiResponse<ProductResponse>> addProductVariant(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductVariantRequest request
+    ) {
+        ProductResponse product = productService.addVariant(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Product variant added successfully", product));
+    }
+
+    @PutMapping("/{id}/variants/{variantId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProductVariant(
+            @PathVariable Long id,
+            @PathVariable Long variantId,
+            @Valid @RequestBody ProductVariantRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Product variant updated successfully",
+                productService.updateVariant(id, variantId, request)));
+    }
+
+    @DeleteMapping("/{id}/variants/{variantId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> deleteProductVariant(
+            @PathVariable Long id,
+            @PathVariable Long variantId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Product variant deleted successfully",
+                productService.deleteVariant(id, variantId)));
     }
 
 //    GET ALL PRODUCTS

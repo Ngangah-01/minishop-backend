@@ -1,6 +1,7 @@
 package com.minishop.backend.order;
 
 import com.minishop.backend.product.Product;
+import com.minishop.backend.product.ProductVariant;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +26,21 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variant_id")
+    private ProductVariant variant;
+
     @Column(nullable = false, length = 100)
     private String productName;
+
+    @Column(length = 50)
+    private String variantSize;
+
+    @Column(length = 50)
+    private String variantColor;
+
+    @Column(length = 100)
+    private String variantSku;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -39,8 +53,16 @@ public class OrderItem {
     }
 
     public OrderItem(Product product, Integer quantity) {
+        this(product, null, quantity);
+    }
+
+    public OrderItem(Product product, ProductVariant variant, Integer quantity) {
         this.product = product;
+        this.variant = variant;
         this.productName = product.getName();
+        this.variantSize = variant == null ? null : variant.getSize();
+        this.variantColor = variant == null ? null : variant.getColor();
+        this.variantSku = variant == null ? null : variant.getSku();
         this.quantity = quantity;
         this.priceAtPurchase = product.getPrice();
     }

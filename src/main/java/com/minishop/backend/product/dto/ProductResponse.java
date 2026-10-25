@@ -5,6 +5,7 @@ import com.minishop.backend.category.dto.CategoryResponse;
 import com.minishop.backend.product.Product;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 public record ProductResponse(
         Long id,
@@ -14,6 +15,8 @@ public record ProductResponse(
         CategoryResponse category,
         Integer stockQuantity,
         String sku,
+        List<ProductImageResponse> images,
+        List<ProductVariantResponse> variants,
         @JsonFormat(shape = JsonFormat.Shape.STRING,
                     pattern = "yyyy-MM-dd HH:mm:ss",
                     timezone = "UTC")
@@ -33,6 +36,8 @@ public record ProductResponse(
                 CategoryResponse.from(product.getCategory()),
                 product.getStockQuantity(),
                 product.getSku(),
+                product.getImages().stream().map(ProductImageResponse::from).toList(),
+                product.getVariants().stream().map(ProductVariantResponse::from).toList(),
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );
