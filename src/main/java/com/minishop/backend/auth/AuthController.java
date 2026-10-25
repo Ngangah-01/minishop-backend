@@ -57,7 +57,7 @@ public ResponseEntity<ApiResponse<AuthResponse>> register(
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         UserResponse user = UserResponse.from(currentUserProvider.getCurrentUser());
         return ResponseEntity.ok(
-                ApiResponse.success("Current user retrieved successfully", user)
+                ApiResponse.success("Current user has been retrieved successfully", user)
         );
     }
 }
