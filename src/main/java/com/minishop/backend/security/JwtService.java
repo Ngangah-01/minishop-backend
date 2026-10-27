@@ -20,7 +20,7 @@ public class JwtService {
     private final long expiration;
 
     public JwtService(
-            @Value("${jwt.secret}") String secret,
+            @Value("${JWT_SECRET}") String secret,
             @Value("${jwt.expiration}") long expiration
     ) {
         // Pre-compute the key ONCE at startup (Supports Base64 secrets),

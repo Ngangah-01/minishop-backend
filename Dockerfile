@@ -1,20 +1,19 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
-
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /workspace
 
-COPY pom.xml .
-RUN mvn -B dependency:go-offline
+# Copy only the build definition first, so Docker can cache the Gradle download
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle settings.gradle ./
+RUN chmod +x gradlew && ./gradlew --no-daemon dependencies > /dev/null
 
 COPY src ./src
-RUN mvn -B -DskipTests package
+RUN ./gradlew --no-daemon bootJar -x test
 
 FROM eclipse-temurin:21-jre
-
 WORKDIR /app
-
 RUN useradd --system --uid 10001 spring
-COPY --from=build /workspace/target/backend-0.0.1-SNAPSHOT.jar /app/app.jar
-
+COPY --from=build /workspace/build/libs/app.jar /app/app.jar
 USER spring
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
