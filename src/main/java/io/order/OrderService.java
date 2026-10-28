@@ -1,0 +1,158 @@
+package io.order;
+
+import io.cart.Cart;
+import io.cart.CartItem;
+import io.cart.CartRepository;
+import io.common.exception.EmptyCartException;
+import io.common.exception.InsufficientStockException;
+import io.common.exception.ResourceNotFoundException;
+import io.order.dto.OrderResponse;
+import io.product.Product;
+import io.security.CurrentUserProvider;
+import io.user.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
+    private final CurrentUserProvider currentUserProvider;
+
+    public OrderService(OrderRepository orderRepository, CartRepository cartRepository,
+                        CurrentUserProvider currentUserProvider) {
+        this.orderRepository = orderRepository;
+        this.cartRepository = cartRepository;
+        this.currentUserProvider = currentUserProvider;
+    }
+
+    @Transactional
+    public OrderResponse placeOrder() {
+        User user = currentUserProvider.getCurrentUser();
+
+        Cart cart = cartRepository.findByUser(user).orElseThrow(EmptyCartException::new);
+        if (cart.getItems().isEmpty()) {
+            throw new EmptyCartException();
+        }
+
+        Order order = new Order(user);
+
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            var variant = cartItem.getVariant();
+            int quantity = cartItem.getQuantity();
+            if (!product.getVariants().isEmpty() && variant == null) {
+                throw new IllegalArgumentException(
+                        "A variant must be selected for product '" + product.getName() + "'");
+            }
+            int available = variant == null ? product.getStockQuantity() : variant.getStockQuantity();
+
+            if (available < quantity) {
+                throw new InsufficientStockException(
+                        "Not enough stock for '" + product.getName() +
+                                "': requested " + quantity +
+                                ", available " + available);
+            }
+
+            if (variant == null) {
+                product.setStockQuantity(product.getStockQuantity() - quantity);
+            } else {
+                variant.setStockQuantity(variant.getStockQuantity() - quantity);
+                product.synchronizeStockWithVariants();
+            }
+
+            order.addItem(new OrderItem(product, variant, quantity));
+        }
+
+        Order saved = orderRepository.save(order);
+
+        // orphanRemoval = true on Cart.items means clearing the list deletes the rows.
+        cart.getItems().clear();
+
+        return OrderResponse.from(saved);
+    }
+
+//    getting all orders for the current user
+@Transactional(readOnly = true)
+public List<OrderResponse> getMyOrders() {
+    User user = currentUserProvider.getCurrentUser();
+    return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
+            .stream()
+            .map(OrderResponse::from)
+            .toList();
+}
+
+// getting one order
+@Transactional(readOnly = true)
+public OrderResponse getMyOrder(Long orderId) {
+
+    User user = currentUserProvider.getCurrentUser();
+
+    Order order = orderRepository
+            .findByIdAndUser(orderId, user)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException(
+                            "Order with id " + orderId + " not found"
+                    )
+            );
+
+    return OrderResponse.from(order);
+}
+    @Transactional
+    public OrderResponse cancelOrder(Long orderId) {
+
+        User user = currentUserProvider.getCurrentUser();
+
+        Order order = orderRepository
+                .findByIdAndUser(orderId, user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order with id " + orderId + " not found"
+                        )
+                );
+
+        /*
+         * Prevent cancelling an order that is already cancelled.
+         */
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Order has already been cancelled"
+            );
+        }
+
+        /*
+         * An order that has already been delivered should not
+         * be cancelled through this endpoint.
+         */
+//        if (order.getStatus() == OrderStatus.DELIVERED) {
+//            throw new IllegalStateException(
+//                    "Delivered orders cannot be cancelled"
+//            );
+//        }
+
+        /*
+         * Restore the stock for every item in the order.
+         */
+        for (OrderItem orderItem : order.getItems()) {
+
+            Product product = orderItem.getProduct();
+            if (orderItem.getVariant() == null) {
+                product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
+            } else {
+                orderItem.getVariant().setStockQuantity(
+                        orderItem.getVariant().getStockQuantity() + orderItem.getQuantity());
+                product.synchronizeStockWithVariants();
+            }
+        }
+
+        /*
+         * Preserve the order as a historical record.
+         */
+        order.setStatus(OrderStatus.CANCELLED);
+
+        return OrderResponse.from(order);
+    }
+}
