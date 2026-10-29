@@ -65,7 +65,7 @@ public abstract class AbstractAuthController<U extends User> {
         form.setHttpAccessLogEntityId((String) req.getAttribute(HttpAccessLog.LOG_ID));
         form.setLocale(locale);
 
-        var authView = getAuthService().completeLogin(form, verificationCodeId);
+        var authView = getAuthService().completeLogin(verificationCodeId, form);
 
         return new EntityApiResponse<>(
             Message.get("complete.login.success", locale),
@@ -82,7 +82,7 @@ public abstract class AbstractAuthController<U extends User> {
         @Valid PasswordResetForm form,
         Locale locale
     ){
-        var authView = getAuthService().resetPassword(form, verificationCodeId);
+        var authView = getAuthService().resetPassword(verificationCodeId, form);
         return new EntityApiResponse<>(
             Message.get("password.change.success", locale),
             authView
