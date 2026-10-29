@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-abstract class OtpForm {
+public abstract class OtpForm {
     @NotBlank(message = "error.empty.otp")
     private String otp;
 }

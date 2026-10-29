@@ -8,13 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CustomerUpdateForm extends UserEditForm {
-    @NotBlank(message = "error.invalid.national.id")
-    private String nationalId;
 
-    @NotBlank(message = "error.invalid.tax.pin")
-    private String taxPin;
-
-    @NotBlank(message = "error.invalid.email")
     @Override
     public String getEmail() {
         return super.getEmail();
@@ -24,9 +18,5 @@ public class CustomerUpdateForm extends UserEditForm {
     @Override
     public String getPhoneNumber() {
         return super.getPhoneNumber();
-    }
-
-    public String getTaxPin(){
-        return this.taxPin.trim().toUpperCase();
     }
 }

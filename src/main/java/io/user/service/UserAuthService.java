@@ -70,7 +70,7 @@ public abstract class UserAuthService<U extends User, R extends UserRepository<U
         }
     }
 
-    public AuthView completeLogin(CompleteLoginForm form, String verificationCodeId) {
+    public AuthView completeLogin(String verificationCodeId, CompleteLoginForm form) {
         VerificationCode verificationCode = verificationCodeService.findByEntityId(verificationCodeId);
 
         U user = switch (verificationCode.getUsernameType()) {
@@ -88,7 +88,7 @@ public abstract class UserAuthService<U extends User, R extends UserRepository<U
         return onUserAuthentication(user);
     }
 
-    public AuthView resetPassword(PasswordResetForm form, String verificationCodeId) {
+    public AuthView resetPassword(String verificationCodeId, PasswordResetForm form) {
         VerificationCode verificationCode = verificationCodeService.findByEntityId(verificationCodeId);
 
         verificationCodeService.verifyOtp(verificationCodeId, form.getOtp());

@@ -1,6 +1,5 @@
 package io.customer.service;
 
-
 import io.customer.entity.Customer;
 import io.customer.repository.CustomerRepository;
 import io.user.form.FetchUserForm;
@@ -25,22 +24,9 @@ public class CustomerReadService extends BaseUserReadService<Customer, CustomerR
                 repository.nameLike(form.getQuery())
                 .or(repository.phoneNumberLike(form.getQuery()))
                 .or(repository.emailLike(form.getQuery()))
-                .or(repository.nationalIdLike(form.getQuery()))
             );
         }
 
         return repository.findAll(spec, repository.defaultPageable(form));
-    }
-
-    public Customer findByNationalId(String nationalId){
-        var spec = repository.notDeleted()
-                .and(repository.nationalIdIs(nationalId));
-        return repository.findOne(spec).orElse(null);
-    }
-
-    public boolean existsByNationalId(String nationalId){
-        var spec = repository.notDeleted()
-                .and(repository.nationalIdIs(nationalId));
-        return repository.exists(spec);
     }
 }

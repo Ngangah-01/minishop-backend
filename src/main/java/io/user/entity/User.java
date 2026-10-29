@@ -35,7 +35,6 @@ public abstract class User extends BaseJpaEntity {
     private String password;
     private String recentAuthId;
     private String notificationId;
-    private String nationalIdNumber;
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;

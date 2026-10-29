@@ -20,7 +20,6 @@ public abstract class BaseUserEditService<U extends User, R extends UserReposito
         user.setPhoneCode(form.getPhoneCode());
         user.setPhoneNumber(form.getPhoneNumber());
         user.setEmail(form.getEmail());
-        user.setNationalIdNumber(form.getNationalIdNumber());
         user.setUserStatus(UserStatus.PENDING_APPROVAL);
         user.setCreatedByEntityId(form.getSessionUserId());
 
@@ -40,10 +39,8 @@ public abstract class BaseUserEditService<U extends User, R extends UserReposito
 
         checkPhoneNumberExists(form.getPhoneNumber(), userId);
         checkEmailExists(form.getEmail(), userId);
-        checkNationalIdNumberExists(form.getNationalIdNumber(), userId);
 
         user.setName(form.getName());
-        user.setNationalIdNumber(form.getNationalIdNumber());
 
         if (!StringUtils.equals(user.getEmail(), form.getEmail())) {
             user.setEmailVerified(false);
@@ -90,20 +87,6 @@ public abstract class BaseUserEditService<U extends User, R extends UserReposito
         );
         if (emailExists) {
             throw new CommonRuntimeException(ExceptionType.ALREADY_EXISTS, "error.user.email.exits");
-        }
-    }
-
-    private void checkNationalIdNumberExists(String nationalIdNumber, String userId){
-        if(StringUtils.isBlank(nationalIdNumber)){
-            return;
-        }
-
-        boolean nationalIdExists = repository.existsByNationalIdNumberAndEntityIdNot(
-                nationalIdNumber,
-                userId
-        );
-        if (nationalIdExists) {
-            throw new CommonRuntimeException(ExceptionType.ALREADY_EXISTS, "error.user.national.id.exits");
         }
     }
 
