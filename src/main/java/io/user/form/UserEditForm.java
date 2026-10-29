@@ -12,11 +12,9 @@ import org.apache.commons.lang.WordUtils;
 @Setter
 public class UserEditForm extends SessionUserIdForm {
     private static final int MAX_NAME_LEN = 100;
+
     @NotBlank(message = "error.invalid.name")
     private String name;
-
-    @Email(message = "error.invalid.email")
-    private String email;
 
     @NotBlank(message = "error.invalid.phone.number")
     private String phoneNumber;
@@ -27,8 +25,8 @@ public class UserEditForm extends SessionUserIdForm {
     @NotBlank(message = "error.invalid.phone.code")
     private String phoneCode;
 
-    @NotBlank(message = "error.invalid.national.id")
-    private String nationalIdNumber;
+    @Email(message = "error.invalid.email")
+    private String email;
 
     public String getName() {
         if (name.length() > MAX_NAME_LEN){

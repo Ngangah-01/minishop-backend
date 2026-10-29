@@ -13,7 +13,6 @@ public interface UserRepository<U extends User> extends BaseJpaRepository<U> {
 
     boolean existsByEmailAndEntityIdNot(String email, String entityId);
 
-    boolean existsByNationalIdNumberAndEntityIdNot(String nationalIdNumber, String entityId);
 
     default Specification<U> userStatusIs(UserStatus userStatus){
         return (root, cb, cq) -> cq.equal(root.get("userStatus"), userStatus);

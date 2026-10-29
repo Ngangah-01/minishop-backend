@@ -9,12 +9,4 @@ abstract class BaseCustomerView extends UserView<Customer> {
         super(entity);
     }
 
-    public String getNationalId(){
-        return entity.getNationalId();
-    }
-
-    public String getTaxPin(){
-        return entity.getTaxPin();
-    }
-
 }

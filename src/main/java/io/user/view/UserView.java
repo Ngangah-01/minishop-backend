@@ -41,8 +41,4 @@ public class UserView<T extends User> extends BaseView<T> {
     public UserStatus getUserStatus(){
         return entity.getUserStatus();
     }
-
-    public  String getNationalIdNumber(){
-        return entity.getNationalIdNumber();
-    }
 }
