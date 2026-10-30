@@ -11,6 +11,10 @@ import org.apache.commons.lang.WordUtils;
 public class UniqueProductCategoryNameValidator extends BaseJpaRepoReadService<ProductCategory, ProductCategoryRepository> implements ConstraintValidator<UniqueProductCategoryName, String> {
     @Override
     public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
+        if(name == null){
+            return true;
+        }
+
         String sanitizedName = WordUtils.capitalize(StringUtils.trimToEmpty(name));
 
         var spec = repository.notDeleted()
