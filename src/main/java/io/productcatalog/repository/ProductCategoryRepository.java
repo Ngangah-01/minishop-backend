@@ -9,4 +9,8 @@ public interface ProductCategoryRepository extends BaseJpaRepository<ProductCate
         return (root, cb, cq) -> cq.equal(root.get("name"), name);
     }
 
+    default Specification<ProductCategory> nameLike(String query){
+        return (root, cq, cb) -> cb.like(root.get("name"), "%" + query + "%");
+    }
+
 }
