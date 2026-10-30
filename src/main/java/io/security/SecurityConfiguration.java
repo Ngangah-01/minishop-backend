@@ -38,7 +38,7 @@ public class SecurityConfiguration  {
     private final String[] permittedUrls = {
             SystemConfig.INTERNAL_USER_BASE_URL + "/verification-code/request",
             SystemConfig.INTERNAL_USER_BASE_URL + "/verification-code/resend/**",
-            SystemConfig.INTERNAL_USER_BASE_URL + "/auth/reset-password",
+            SystemConfig.INTERNAL_USER_BASE_URL + "/auth/reset-password/**",
             SystemConfig.INTERNAL_USER_BASE_URL + "/auth/init-login",
             SystemConfig.INTERNAL_USER_BASE_URL + "/auth/complete-login/**",
             SystemConfig.INTERNAL_USER_BASE_URL + "/auth/update-public-key",
