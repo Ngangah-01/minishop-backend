@@ -25,6 +25,20 @@ public class ProductCategoryEditService extends BaseJpaRepoEditService<ProductCa
         return productCategory;
     }
 
+    public ProductCategory editProductCategory(String productCategoryEntityId, ProductCategoryEditForm form){
+        var productCategory = findByEntityId(productCategoryEntityId);
+        mapCommonFields(productCategory, form);
+        productCategory = save(productCategory, form.getSessionUserId());
+
+        var activityLogForm = new CreateActivityLogForm();
+        activityLogForm.setOwningEntityId(productCategory.getEntityId());
+        activityLogForm.setAction("ProductCategory edit");
+        activityLogForm.setSessionUserId(form.getSessionUserId());
+        activityLogQueuingService.enqueueActivityLog(activityLogForm);
+
+        return productCategory;
+    }
+
     private void mapCommonFields(ProductCategory productCategory, ProductCategoryEditForm form){
         productCategory.setName(form.getName());
         productCategory.setDescription(form.getDescription());
