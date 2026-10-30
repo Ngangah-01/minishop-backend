@@ -36,6 +36,7 @@ public class ProductItem extends BaseJpaEntity {
     @Column(precision = FormatUtil.BIG_DECIMAL_PRECISION, scale = FormatUtil.BIG_DECIMAL_SCALE)
     private BigDecimal price;
 
+    @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
     public void setProductCategory(ProductCategory productCategory) {
