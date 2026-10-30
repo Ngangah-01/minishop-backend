@@ -8,7 +8,9 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
-public class UniqueProductCategoryNameValidator extends BaseJpaRepoReadService<ProductCategory, ProductCategoryRepository> implements ConstraintValidator<UniqueProductCategoryName, String> {
+public class UniqueProductCategoryNameValidator
+        extends BaseJpaRepoReadService<ProductCategory, ProductCategoryRepository>
+        implements ConstraintValidator<UniqueProductCategoryName, String> {
     @Override
     public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
         if(name == null){
