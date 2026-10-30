@@ -3,9 +3,7 @@ package io.productcatalog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.lib.entity.BaseJpaEntity;
 import io.lib.service.FormatUtil;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +12,11 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
+@Table(
+        indexes = {
+                @Index(name = "idx_product_item_product_category_entity_id", columnList = "productCategoryEntityId")
+        }
+)
 public class ProductItem extends BaseJpaEntity {
 
     @JsonIgnore
@@ -32,6 +35,8 @@ public class ProductItem extends BaseJpaEntity {
 
     @Column(precision = FormatUtil.BIG_DECIMAL_PRECISION, scale = FormatUtil.BIG_DECIMAL_SCALE)
     private BigDecimal price;
+
+    private ProductStatus status;
 
     public void setProductCategory(ProductCategory productCategory) {
         this.productCategory = productCategory;
