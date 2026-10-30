@@ -19,7 +19,7 @@ import java.util.Locale;
 import static io.lib.service.SystemConfig.INTERNAL_USER_BASE_URL;
 
 @RestController
-@RequestMapping(INTERNAL_USER_BASE_URL + "/product-category")
+@RequestMapping(INTERNAL_USER_BASE_URL + "/product-categories")
 public class ProductCategoryController {
 
     private ProductCategoryEditService productCategoryEditService;
