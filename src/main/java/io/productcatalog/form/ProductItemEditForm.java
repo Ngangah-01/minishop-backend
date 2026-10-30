@@ -24,7 +24,6 @@ public class ProductItemEditForm extends SessionUserIdForm {
 
     private String imageUrl;
 
-    @NotNull
     private ProductStatus status;
 
     private BigDecimal price;

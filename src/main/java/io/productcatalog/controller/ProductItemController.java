@@ -3,6 +3,7 @@ package io.productcatalog.controller;
 import io.lib.service.Message;
 import io.lib.view.EntityApiResponse;
 import io.lib.view.PagedEntityApiResponse;
+import io.productcatalog.form.ProductItemEditForm;
 import io.productcatalog.form.ProductItemFetchForm;
 import io.productcatalog.form.ProductItemRegistrationForm;
 import io.productcatalog.service.ProductItemEditService;
@@ -35,6 +36,21 @@ public class ProductItemController {
 
         return new EntityApiResponse<>(
                 Message.get("product.item.registration.succeess", locale),
+                new ProductItemView(product)
+        );
+    }
+
+    @PreAuthorize("hasAuthority('EDIT_PRODUCT_ITEM')")
+    @PutMapping("edit/{productItemId}")
+    public EntityApiResponse<ProductItemView> editItem(
+            @PathVariable String productItemId,
+            @RequestBody @Valid ProductItemEditForm form,
+            Authentication auth,
+            Locale locale){
+        form.setSessionUserId(auth.getName());
+        var product = productItemEditService.updateItem(productItemId, form);
+        return new EntityApiResponse<>(
+                Message.get("product.item.update.succeess", locale),
                 new ProductItemView(product)
         );
     }
