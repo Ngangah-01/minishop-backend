@@ -40,8 +40,6 @@ public abstract class UserAuthService<U extends User, R extends UserRepository<U
     public VerificationCode initLogin(InitLoginForm form) {
         U user = getUser(form);
 
-
-
         validateUserStatus(user);
 
         validatePassword(user, form);
