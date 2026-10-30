@@ -20,7 +20,7 @@ public class ProductCategoryEditService extends BaseJpaRepoEditService<ProductCa
 
         var activityLogForm = new CreateActivityLogForm();
         activityLogForm.setOwningEntityId(productCategory.getEntityId());
-        activityLogForm.setAction("ProductCategory creation");
+        activityLogForm.setAction("Product category registration");
         activityLogForm.setSessionUserId(form.getSessionUserId());
         activityLogQueuingService.enqueueActivityLog(activityLogForm);
 
@@ -36,7 +36,7 @@ public class ProductCategoryEditService extends BaseJpaRepoEditService<ProductCa
 
         var activityLogForm = new CreateActivityLogForm();
         activityLogForm.setOwningEntityId(productCategory.getEntityId());
-        activityLogForm.setAction("ProductCategory edit");
+        activityLogForm.setAction("Product category edit");
         activityLogForm.setSessionUserId(form.getSessionUserId());
         activityLogQueuingService.enqueueActivityLog(activityLogForm);
 
