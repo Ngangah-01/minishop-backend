@@ -20,7 +20,7 @@ import java.util.Locale;
 import static io.lib.service.SystemConfig.INTERNAL_USER_BASE_URL;
 
 @RestController
-@RequestMapping(INTERNAL_USER_BASE_URL + "/org-branch")
+@RequestMapping(INTERNAL_USER_BASE_URL + "/org-branches")
 public class OrgBranchController {
     private OrgBranchEditService orgBranchEditService;
     private OrgBranchReadService orgBranchReadService;
