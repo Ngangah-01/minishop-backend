@@ -8,6 +8,7 @@ import io.customer.view.CustomerView;
 import io.lib.service.Message;
 import io.lib.view.EntityApiResponse;
 import io.userauthentication.controller.AbstractAuthController;
+import io.userauthentication.view.AuthView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,16 +26,17 @@ public class CustomerAuthController extends AbstractAuthController<Customer> {
     private CustomerEditService customerEditService;
 
     @PostMapping("register")
-    public EntityApiResponse<CustomerView> registerCustomerAccount(
+    public EntityApiResponse<AuthView> registerCustomerAccount(
         @RequestBody
         @Valid
         CustomerSelfRegistrationForm form,
         Locale locale
     ){
         var customer = customerEditService.register(form);
+        var view = customerAuthService.onUserAuthentication(customer);
         return new EntityApiResponse<>(
             Message.get("user.registration.success", locale),
-            new CustomerView(customer)
+            view
         );
     }
 
