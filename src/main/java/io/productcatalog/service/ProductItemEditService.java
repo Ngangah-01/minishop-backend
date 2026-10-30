@@ -23,7 +23,6 @@ public class ProductItemEditService extends BaseJpaRepoEditService<ProductItem, 
         productItem.setDescription(form.getDescription());
         productItem.setPrice(form.getPrice());
         productItem.setImageUrl(form.getImageUrl());
-        productItem.setStatus(form.getStatus());
         productItem.setProductCategory(productCategory);
         productItem.setCreatedByEntityId(form.getSessionUserId());
 
@@ -48,7 +47,6 @@ public class ProductItemEditService extends BaseJpaRepoEditService<ProductItem, 
         productItem.setDescription(form.getDescription());
         productItem.setPrice(form.getPrice());
         productItem.setImageUrl(form.getImageUrl());
-        productItem.setStatus(form.getStatus());
         productItem.setProductCategory(productCategory);
         productItem.setCreatedByEntityId(form.getSessionUserId());
 
