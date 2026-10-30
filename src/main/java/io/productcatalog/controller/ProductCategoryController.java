@@ -1,10 +1,13 @@
 package io.productcatalog.controller;
 
+import io.lib.form.BaseFetchForm;
 import io.lib.service.Message;
 import io.lib.view.EntityApiResponse;
+import io.lib.view.PagedEntityApiResponse;
 import io.productcatalog.form.ProductCategoryEditForm;
 import io.productcatalog.form.ProductCategoryRegistrationForm;
 import io.productcatalog.service.ProductCategoryEditService;
+import io.productcatalog.service.ProductCategoryReadService;
 import io.productcatalog.view.ProductCategoryView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import static io.lib.service.SystemConfig.INTERNAL_USER_BASE_URL;
 public class ProductCategoryController {
 
     private ProductCategoryEditService productCategoryEditService;
+    private ProductCategoryReadService productCategoryReadService;
 
     @PreAuthorize("hasAuthority('REGISTER_PRODUCT_CATEGORY')")
     @PostMapping("register")
@@ -53,9 +57,31 @@ public class ProductCategoryController {
         );
     }
 
+    @PreAuthorize("hasAuthority('VIEW_PRODUCT_CATEGORY')")
+    @GetMapping("list")
+    public PagedEntityApiResponse<ProductCategoryView> list(
+            @RequestParam(name="query", required = false)String query,
+            @RequestParam(name="pageNum", required = false, defaultValue = "0") Integer pageNum,
+            @RequestParam(name="pageSize", required = false, defaultValue = "100") Integer pageSize
+    ){
+        var form = new BaseFetchForm();
+        form.setQuery(query);
+        form.setPageNum(pageNum);
+        form.setPageSize(pageSize);
+
+        var page = productCategoryReadService .listProductCategories(form);
+        var views = page.getContent().stream().map(ProductCategoryView::new).toList();
+        return new PagedEntityApiResponse<>(page, views);
+    }
+
     @Autowired
     public void setProductCategoryEditService(ProductCategoryEditService service){
         this.productCategoryEditService = service;
+    }
+
+    @Autowired
+    public void setProductCategoryReadService(ProductCategoryReadService service){
+        this.productCategoryReadService = service;
     }
 
 }
