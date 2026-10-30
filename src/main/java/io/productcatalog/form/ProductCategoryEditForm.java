@@ -22,5 +22,4 @@ public class ProductCategoryEditForm extends SessionUserIdForm {
     public String getName() {
         return WordUtils.capitalize(StringUtils.trimToEmpty(name).trim());
     }
-
 }
