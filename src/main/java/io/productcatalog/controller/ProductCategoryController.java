@@ -38,7 +38,7 @@ public class ProductCategoryController {
     }
 
     @PreAuthorize("hasAuthority('EDIT_PRODUCT_CATEGORY')")
-    @PostMapping("edit/{productCategoryId}")
+    @PutMapping("edit/{productCategoryId}")
     public EntityApiResponse<ProductCategoryView> editProductCategory(
             @PathVariable String productCategoryId,
             @RequestBody @Valid ProductCategoryEditForm form,
