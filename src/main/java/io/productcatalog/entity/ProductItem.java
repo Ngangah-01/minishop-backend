@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(
         indexes = {
-                @Index(name = "idx_product_item_product_category_entity_id", columnList = "productCategoryEntityId")
+                @Index(name = "idx_product_category_entity_id", columnList = "productCategoryEntityId")
         }
 )
 public class ProductItem extends BaseJpaEntity {
