@@ -24,8 +24,6 @@ public class ProductItemEditForm extends SessionUserIdForm {
 
     private String imageUrl;
 
-    private ProductStatus status;
-
     private BigDecimal price;
 
     @NotBlank(message = "error.invalid.product.category")
